@@ -1,0 +1,6 @@
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\bin\Debug\DMImodule.exe.config
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\bin\Debug\DMImodule.exe
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\bin\Debug\DMImodule.pdb
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\obj\Debug\DMImodule.csprojResolveAssemblyReference.cache
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\obj\Debug\DMImodule.exe
+c:\users\h\documents\visual studio 2015\Projects\DMImodule\DMImodule\obj\Debug\DMImodule.pdb
