@@ -9,15 +9,16 @@ namespace DMImodule
    
     class Program
     {
-        public int size = 5;
+        //public int size = 7;
         static void Main(string[] args)
         {
             string line;
             string[] words ;
-            AdjacencyList adjacencyList = new AdjacencyList(5);
+            int size = 7;
+            AdjacencyList adjacencyList = new AdjacencyList(size);
 
             System.IO.StreamReader file =
-                new System.IO.StreamReader(@"C:\Users\h\Desktop\MYBOY\Sneha\sample.txt");
+                new System.IO.StreamReader(@"C:\Users\h\Desktop\MYBOY\Sneha\subchallenge1\test1.txt");
             while ((line = file.ReadLine()) != null)
             {
                 // System.Console.WriteLine(line);
@@ -38,7 +39,7 @@ namespace DMImodule
             //adjacencyList.Centrality();
             //adjacencyList.CentralityW();
             //adjacencyList.print();
-            adjacencyList.cliques(0);
+            adjacencyList.cliques(2);
             adjacencyList.printcliques();
             Console.ReadLine();
         }
@@ -47,16 +48,23 @@ namespace DMImodule
     class AdjacencyList
     {
         LinkedList<Tuple<int, double>>[] adjacencyList;
+        public int size;
+        int count1 = 0;
+        int count2 = 0;
         double[] PageRank ;
         double[] PageRankweights;
         double[] Centralitydegree;
         double[] Centralitydegreew;
+        int[] nieghbour;
         public int N=0;
-        LinkedList<Tuple<int>>[] Clique;
+        LinkedList<int> Max_Clique = new LinkedList<int>();
+        LinkedList<int> temp_clique = new LinkedList<int>();
+        LinkedList<int> initial = new LinkedList<int>();
 
         // Constructor - creates an empty Adjacency List
         public AdjacencyList(int vertices)
         {
+            size = vertices;
             adjacencyList = new LinkedList<Tuple<int, double>>[vertices];
 
             for (int i = 0; i < adjacencyList.Length; ++i)
@@ -130,7 +138,7 @@ namespace DMImodule
         //Page Rank Array
         public void PGRankarray()
         {
-            int N = 5;
+            int N = size; ;
             PageRank = new double[N];
             for (int i =0; i<N; i++)
             {
@@ -152,7 +160,7 @@ namespace DMImodule
         // Page Rank without weights
         public double PageRankarray(int X)
         {
-            int N = 5;
+            int N = size;
             double d = 0.85, sum = 0.0,Pagerank;
             foreach(Tuple<int,double> edge in adjacencyList[X])
             {
@@ -166,7 +174,7 @@ namespace DMImodule
         //Page Rank with weights
         public void PGRankarrayW()
         {
-            int N = 5;
+            int N = size;
             PageRankweights = new double[N];
             for (int i = 0; i < N; i++)
             {
@@ -187,7 +195,7 @@ namespace DMImodule
 
         public double PageRankarrayweights(int X)
         {
-            int N = 5;
+            int N = size;
             double d = 0.85, sum = 0.0, Pagerank;
             foreach (Tuple<int, double> edge in adjacencyList[X])
             {
@@ -201,10 +209,10 @@ namespace DMImodule
 
         public void Centrality()
         {
-            int N = 5;
+            int N = size;
             
             Centralitydegree = new double[N];
-            for ( int i =0; i< 5; i++)
+            for ( int i =0; i< N; i++)
             {
                 Centralitydegree[i] = 0;
                 Centralitydegree[i] = Convert.ToDouble(NoOfNieghbours(i)) / Convert.ToDouble(N);
@@ -212,10 +220,10 @@ namespace DMImodule
         }
         public void CentralityW()
         {
-            int N = 5;
+            int N = size;
             double sum = 0;
             Centralitydegreew = new double[N];
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < N; i++)
             {
                 sum = 0;
                 Centralitydegreew[i] = 0;
@@ -230,12 +238,12 @@ namespace DMImodule
 
         public void print()
         {
-            for (int i=0; i < 5;i++)
+            for (int i=0; i < size;i++)
             {
                 Console.Write(Centralitydegree[i]+"\t");
             }
             Console.WriteLine();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < size; i++)
             {
                 Console.Write(Centralitydegreew[i] + "\t");
             }
@@ -243,81 +251,151 @@ namespace DMImodule
 
         public void cliques(int X)
         {
-            int i=0,j=0;
-            int[] nieghbour = new int[NoOfNieghbours(X)];
+            int i = 0;
+            nieghbour = new int[NoOfNieghbours(X)];
             foreach (Tuple<int,double> edge in adjacencyList[X])
             {
                 nieghbour[i] = edge.Item1;
                 i++;  
             }
-             N = Convert.ToInt32(Math.Pow(2, i));
-            Clique = new LinkedList<Tuple<int>>[N];
-            for( i =0; i< N; i++)
-            {
-                Clique[i] = new LinkedList<Tuple<int>>();
-               // addedgeclique(i, X);
-            }
+            int N = nieghbour.Length;
+            //Console.WriteLine(N);
             i = 0;
-            int index = 0;
-            while (i!= NoOfNieghbours(X))
-            {
-                Console.WriteLine("hellooo" + i);
-                j = 0;
-                addedgeclique(index, X);
-                addedgeclique(index, nieghbour[i]);
-                while(j< NoOfNieghbours(X))
-                {
-                    Console.WriteLine("next" + j);
-                    Console.WriteLine(exists(nieghbour[j], Clique[index]));
-                    if (exists(nieghbour[j], Clique[index]))
-                    {
-                        j++;
-                    }
-                    else
-                    {
-                        if (check(nieghbour[j], Clique[index]))
-                        {
-                            addedgeclique(index, nieghbour[j]);
-                        }
-                        else
-                        {
-                            index++;
-                        }
-                        j++;
-                    }
-                }
-                index++;
-                i++;
-
-            }
-          
-
+            //insert the first niegbour in array
+            initial.AddFirst(X);
+            temp_clique.AddFirst(X);
+            
+            insertvalue(i, N);
+            
+        // Console.WriteLine("smarttttmove");
+           // printall(temp_clique);
+            donotinsertvalue(temp_clique,i, N);
+       
         }
-
-        private bool exists(int j, LinkedList<Tuple<int>> linkedList)
+    public void insertvalue(int index, int N)
         {
-            Boolean flag = false;
-            foreach(Tuple<int> item in linkedList)
+            //count1++;
+            int i = index;
+            addedgeclique(nieghbour[i]);
+            i++;
+            if(i!=N)
             {
-                if (j == item.Item1)
+                 //Console.WriteLine("hiii"+i);
+                //Console.WriteLine(check(nieghbour[i], temp_clique));
+               // Boolean temp = (check(nieghbour[i], temp_clique) && branchboundtest(i, N));
+               // Console.WriteLine(temp);
+                if (check(nieghbour[i], temp_clique) && branchboundtest(i,N))
                 {
-                    flag = true;
-                    return flag;
+                    insertvalue(i, N);
+         //           Console.WriteLine("donot"+i);
+                  //  printall(temp_clique);
+                    donotinsertvalue(temp_clique, i, N);
+                        
                 }
                 else
-                    flag = false;
+                {
+                    printall(temp_clique);
+                    if (Max_Clique.Count() < temp_clique.Count())
+                    {
+
+                        //          Max_Clique = temp_clique;
+                        assignMaxclique(temp_clique);
+                        printcliques();
+                    }
+                    return;
+                }
             }
-            return flag;
+           printall(temp_clique);
+            if (Max_Clique.Count() < temp_clique.Count())
+            {
+
+                assignMaxclique(temp_clique);
+                printcliques();
+            }
+            //  temp_clique = new LinkedList<int>();
+            //temp_clique = initial;
+            return ;
         }
 
-        public bool check(int j, LinkedList<Tuple<int>> linkedList)
+        public void assignMaxclique( LinkedList<int> temp_clique)
+        {
+            Max_Clique = new LinkedList<int>();
+            foreach( int value in temp_clique)
+            {
+                Max_Clique.AddLast(value);
+            }
+        }
+
+        public void donotinsertvalue(LinkedList<int> temp,int index, int N)
+        {
+           // printcliques();
+           // Console.WriteLine("hello" + index);
+           // count2++;
+            if (temp.Count > 0)
+            {
+                temp_clique.RemoveLast();
+              
+            }
+            //printcliques();
+            int i = index;
+            i++;
+            if (i != N)
+            {
+               
+                if (check(nieghbour[i], temp_clique) && branchboundtest(i, N))
+                {
+                    insertvalue(i, N);
+                    donotinsertvalue(temp_clique, i, N);
+
+                    
+                }
+                else
+                {
+                    printcliques();
+                    printall(temp_clique);
+                    //Console.WriteLine(Max_Clique.Count() + "Temp value" + temp_clique.Count());
+                    if (Max_Clique.Count() < temp_clique.Count())
+                    {
+
+                        assignMaxclique(temp_clique);
+                      //  printcliques();
+                    }
+                    
+                    return;
+                }
+            }
+            printcliques();
+             printall(temp_clique);
+            if (Max_Clique.Count() < temp_clique.Count())
+            {
+                assignMaxclique(temp_clique);
+            }
+            // temp_clique = new LinkedList<int>();
+            printcliques();
+            return;
+        }
+
+        private bool branchboundtest(int index, int N)
+        {
+            Boolean flag = true;
+            int temp_length = temp_clique.Count();
+            int max_length = Max_Clique.Count();
+
+            if (max_length >= (temp_length+N-index))
+            {
+                flag = false;          
+            }
+          return flag;
+        }
+ 
+        public bool check(int j, LinkedList<int> linkedList)
         {
             Boolean flag = false;
-            foreach( Tuple<int> value in linkedList)
+            foreach( int value in linkedList)
             {
                 foreach( Tuple<int, double> item in adjacencyList[j])
                 {
-                    if(value.Item1 == item.Item1)
+                    if(value == item.Item1)
                     {
                         flag = true;
                         break;  
@@ -333,26 +411,34 @@ namespace DMImodule
             return flag;
         }
 
-        public void addedgeclique(int startVertex, int endVertex)
+        public void addedgeclique( int endVertex)
         {
-            Clique[startVertex].AddLast(new Tuple<int>(endVertex));
+            temp_clique.AddLast(endVertex);
         }
 
         public void printcliques()
-        {
-            int i = 0;
-
-            while(i != N)
-            {
-                Console.Write("Clique[" + i + "]");
-                foreach ( Tuple<int> value in Clique[i])
+        { 
+            
+                Console.Write("Clique[ Maxium ]");
+                foreach ( int value in Max_Clique)
                 {
 
-                    Console.Write(value.Item1 + "\t");
+                    Console.Write(value + "\t");
                 }
                 Console.WriteLine();
-                i++;
-            }
+            //Console.WriteLine(count1+"donot"+count2);
         }
+        public void printall(LinkedList<int> temp)
+        {
+            Console.Write("Clique[  ]");
+            foreach (int value in temp)
+            {
+
+                Console.Write(value + "\t");
+            }
+            Console.WriteLine();
+           
+        }
+        
     }
 }
